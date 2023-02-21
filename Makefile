@@ -95,7 +95,7 @@ dist-clean:
 dist: dist-clean dist-prep build
 	install -m 666 build.blueclover_plt_demo_v2_nrf52832/shell/zephyr/zephyr.hex dist/shell-pltdemov2-$(VERSION_TAG).hex
 	install -m 666 build.blueclover_plt_demo_v2_nrf52832/tester/zephyr/zephyr.hex dist/tester-pltdemov2-$(VERSION_TAG).hex
-	sed 's/{{BOARD}}/pltdemov2/g; s/{{VERSION}}/$(VERSION_TAG)/g' test-suites/ict.yaml.template > dist/ict-pltdemov2-$(VERSION_TAG).yaml
+	sed 's/{{BOARD}}/pltdemov2/g; s/{{VERSION}}/$(VERSION_TAG)/g' test-suites/ict-dtm.yaml.template > dist/ict-dtm-pltdemov2-$(VERSION_TAG).yaml
 
 .PHONY: deploy
 deploy:
