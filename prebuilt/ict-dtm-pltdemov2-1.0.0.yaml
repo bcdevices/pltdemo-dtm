@@ -1,0 +1,103 @@
+title: "ICT DTM v1.0.0"
+suite:
+
+- ident: PREP
+  title: Prepare fixture
+  steps:
+  - command: power off
+  - command: uartCfg UART0 115200
+  - command: power 5V on
+
+- ident: PROG.DSW
+  title: Program MCU
+  steps:
+  - command: identify nRF52
+  - command: program nRF52 shell-pltdemov2-1.0.0.hex
+
+- ident: MCURESET
+  title: Reset MCU
+  steps:
+  - command: pin SWD_NRST output low
+  - command: pin SWD_NRST output high
+
+- ident: SHELL
+  title: Shell interaction
+  steps:
+  # Check availability of Zephyr shell
+  - uartcmd: uart UART0
+    send: "\r\nkernel version\r\n"
+    expect: "Zephyr version"
+    extract: "Zephyr version (.*)\r\n"
+    extractKey: ZEPHYR_VERSION
+
+# If DUT is compiled with CONFIG_BT_CTLR_DTM, these commands are available:
+#
+# ```
+# bt test_tx <chan> <len> <type> <phy>
+# bt test_rx <chan> <phy> <mod_idx>
+# bt test_end
+# ```
+#
+# All parameters for Zephyr BT shell DTM commands are interpreted as hex values.
+#
+# - `type`: BT_HCI_LE_TEST_CTE_TYPE_ANY = 0
+# - `phy`: BT_HCI_LE_RX_PHY_1M = 0x01
+# - `mod_idx`: BT_HCI_LE_MOD_INDEX_STANDARD = 0
+
+- ident: BLE.RX
+  title: Receive BLE from DUT
+  steps:
+
+  # Ensure dongle is not in DTM
+  - command: ble test stop
+
+  # Start receive by PLT
+  - command: ble test recv 14
+
+  # Start transmit by DUT
+  - uartcmd: uart UART0
+    send: "\r\nbt test_tx 0x0e 0x10 0 0x01\r\n"
+    expect: "test_tx..."
+  - command: sleepms 3000 "Waiting 3s for transmits from DUT"
+
+  # Stop transmit by DUT
+  - uartcmd: uart UART0
+    send: "\r\nbt test_end\r\n"
+    expect: "num_rx= 0"
+
+  # Stop receive by PLT
+  - command: ble test stop
+    extractKey: BLE_RX_COUNT
+
+  # Evaluate number of packets received from DUT
+  - command: eval "%BLE_RX_COUNT% > 3000"
+
+- ident: BLE.TX
+  title: Transmit BLE to DUT
+  steps:
+
+  # Ensure dongle is not in DTM
+  - command: ble test stop
+
+  # Start receive by DUT
+  - uartcmd: uart UART0
+    send: "\r\nbt test_rx 0x0e 0x01 0x00\r\n"
+    expect: "test_rx..."
+
+  # Start transmit by PLT
+  - command: ble test xmit 14
+  - command: sleepms 3000 "Waiting 3s for DUT to receive"
+
+  # Stop transmit by PLT
+  - command: ble test stop
+
+  # Stop receive by DUT
+  - uartcmd: uart UART0
+    send: "\r\nbt test_end\r\n"
+    #  'num_rx=33035\r\n'
+    expect: "num_rx="
+    extract: "num_rx= (.*).\r\n"
+    extractKey: BLE_TX_COUNT
+
+  # Evaluate number of packets received by DUT
+  - command: eval "%BLE_TX_COUNT% > 3000"
