@@ -2,12 +2,18 @@
 
 GitHub repo demonstrating 
 [Low-level BLE Tests](https://docs.pltcloud.com/TestPlanReference/command/ble_test/)
-with the
-Production Line Tool.
+with Blue Clover's [Production Line Tool](https://bcdevices.com/plt/)
 
-- Build platform: macOS, Linux
-- Host platform: [PLT Demo V2 (nRF52)](https://docs.pltcloud.com/acc/pltdemov2/)
+- Host platform: [Production Line Tool](https://bcdevices.com/plt/)
 - Target platform: [PLT Demo V2 (nRF52)](https://docs.pltcloud.com/acc/pltdemov2/)
+
+## Artifacts
+
+- YAML test plan ([prebuilt](prebuilt/ict-dtm-pltdemov2-1.0.0.yaml))
+  to execute on a [Production Line Tool](https://bcdevices.com/plt/)
+- Firmware images for the [PLT Demo V2 (nRF52)](https://docs.pltcloud.com/acc/pltdemov2/):
+  - [Zephyr Shell](https://docs.zephyrproject.org/latest/services/shell/index.html) firmware image ([prebuilt](prebuilt/shell-pltdemov2-1.0.0.hex))
+  - [Zephyr Bluetooth Tester](https://github.com/zephyrproject-rtos/zephyr/tree/main/tests/bluetooth/tester) firmware image ([prebuilt](prebuilt/tester-pltdemov2-1.0.0.hex))
 
 ## Docker build
 
